@@ -1,0 +1,162 @@
+<?php
+
+namespace FinalProject\DTOs;
+
+use DateTime;
+use Teacher\GivenCode\Abstracts\AbstractDTO;
+use Teacher\GivenCode\Exceptions\ValidationException;
+class UserDTO extends AbstractDTO{
+    
+    public const TABLE_NAME = "users";
+    
+    public const USERNAME_MAX_LENGHT = 20;
+    public const PASSWORD_MAX_LENGHT = 16;
+    public const EMAIL_MAX_LENGHT = 50;
+    
+    private int $userid;
+    private string $username;
+    private string $password;
+    private string $email;
+    private ?DateTime $creationDate;
+    private ?DateTime $modifyDate;
+    
+    
+    public function __construct() {
+        parent::__construct();
+    }
+    
+    public static function fromValues(string $username, string $passoword, string $email) : UserDTO{
+        $instance = new UserDTO();
+        $instance -> setUserName($username);
+        $instance -> setPassword($passoword);
+        $instance -> setEmail($email);
+        return $instance;
+    }
+    
+    public static function fromDbArray(array $dbAssocArray) : UserDTO {
+        $object = new UserDTO();
+        $object->setUserId((int) $dbAssocArray["userid"]);
+        $object->setUserName($dbAssocArray["username"]);
+        $object->setPassword($dbAssocArray["password"]);
+        $object->setEmail($dbAssocArray["email"]);
+        $object->setCreationDate(
+            DateTime::createFromFormat(DB_DATETIME_FORMAT, $dbAssocArray["creationdate"])
+        );
+        $object->setLastModificationDate(
+            (empty($dbAssocArray["modifydate"])) ? null
+                : DateTime::createFromFormat(DB_DATETIME_FORMAT, $dbAssocArray["modifydate"])
+        );
+        return $object;
+    }
+    
+    public function getDatabaseTableName() : string {
+        return self::TABLE_NAME;
+    }
+    
+    public function getUserId() : int {
+        return $this->userid;
+    }
+    
+    public function setUserId(int $userid) : void {
+        if ($userid < 1) {
+            throw new ValidationException("[userid] value must be a positive integer greater than 0.");
+        }
+        $this->userid = $userid;
+    }
+    
+    public function getUserName() : string {
+        return $this->username;
+    }
+    
+    public function setUserName(string $username) : void {
+        if (mb_strlen($username) > self::USERNAME_MAX_LENGHT) {
+            throw new ValidationException("[username] value must be a string no longer than " . self::USERNAME_MAX_LENGHT .
+                                          " characters; found length: [" . mb_strlen($username) . "].");
+        }
+        $this->username = $username;
+    }
+    
+    public function getPassword() : string {
+        return $this->password;
+    }
+    
+    public function setPassword(string $password) : void {
+        if (mb_strlen($password) > self::PASSWORD_MAX_LENGHT) {
+            throw new ValidationException("[paswword] value must be a string no longer than " . self::PASSWORD_MAX_LENGHT .
+                                          " characters; found length: [" . mb_strlen($password) . "].");
+        }
+        $this->password = $password;
+    }
+    
+    public function getEmail() : string {
+        return $this->email;
+    }
+    
+    public function setEmail(string $email) : void {
+        if (mb_strlen($email) > self::EMAIL_MAX_LENGHT) {
+            throw new ValidationException("[email] value must be a string no longer than " . self::EMAIL_MAX_LENGHT .
+                                          " characters; found length: [" . mb_strlen($email) . "].");
+        }
+        $this->email = $email;
+    }
+    
+    public function getCreationDate() : DateTime {
+        return $this->creationDate;
+    }
+    
+    public function setCreationDate(DateTime $creationDate) : void {
+        $this->creationDate = $creationDate;
+    }
+    
+    public function getModifyDate() : DateTime {
+        return $this->modifyDate;
+    }
+    
+    public function setModifyDate(DateTime $modifyDate) : void {
+        $this->modifyDate = $modifyDate;
+    }
+    
+    public function validateForDbCreation(bool $optThrowExceptions = true) : bool {
+        if (empty($this->username)) {
+            if ($optThrowExceptions) {
+                throw new ValidationException("UserDTO is not valid for DB creation: username value not set.");
+            }
+            return false;
+        }
+        if (empty($this->password)) {
+            if ($optThrowExceptions) {
+                throw new ValidationException("UserDTO is not valid for DB creation: password value not set.");
+            }
+            return false;
+        }
+        if (empty($this->email) || !filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+            if ($optThrowExceptions) {
+                throw new ValidationException("UserDTO is not valid for DB creation: email value not set or with wrong format.");
+            }
+            return false;
+        }
+        return true;
+    }
+    
+    public function validateForDbUpdate(bool $optThrowExceptions = true) : bool {
+        if (empty($this->username)) {
+            if ($optThrowExceptions) {
+                throw new ValidationException("UserDTO is not valid for DB creation: username value not set.");
+            }
+            return false;
+        }
+        if (empty($this->password)) {
+            if ($optThrowExceptions) {
+                throw new ValidationException("UserDTO is not valid for DB creation: password value not set.");
+            }
+            return false;
+        }
+        if (empty($this->email) || !filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+            if ($optThrowExceptions) {
+                throw new ValidationException("UserDTO is not valid for DB creation: email value not set or with wrong format.");
+            }
+            return false;
+        }
+        return true;
+    }
+}
