@@ -92,7 +92,7 @@ class PermissionDAO {
         $statement->execute();
         $updated_permission = $this->getRecordById($permission->getPermissionId());
         if (($updated_permission === null)) {
-            throw new RuntimeException("Error while fetching information of the new permission. User ID: {$permission->getUsergroupId()}");
+            throw new RuntimeException("Error while fetching information of the new permission. User ID: {$permission->getPermissionId()}");
         }
         return $updated_permission;
     }
