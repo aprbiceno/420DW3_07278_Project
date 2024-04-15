@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace FinalProject\DAOs;
 
@@ -8,9 +9,16 @@ use PDO;
 use RuntimeException;
 use Teacher\GivenCode\Exceptions\ValidationException;
 
+/**
+ *
+ */
 class UsergroupDAO {
     public function __construct() {}
     
+    /**
+     * @return array
+     * @throws \Teacher\GivenCode\Exceptions\RuntimeException
+     */
     public function getAllRecords() : array {
         $query = "SELECT * FROM `" . UsergroupDTO::TABLE_NAME . "`;";
         $connection = DBConnectionService::getConnection();
@@ -24,6 +32,11 @@ class UsergroupDAO {
         return $usergroups;
     }
     
+    /**
+     * @param int $usergroupid
+     * @return UsergroupDTO|null
+     * @throws \Teacher\GivenCode\Exceptions\RuntimeException
+     */
     public function getRecordById(int $usergroupid) : ?UsergroupDTO {
         $query = "SELECT * FROM `" . UsergroupDTO::TABLE_NAME . "` WHERE `usergroupid` = :usergroupid ;";
         $connection = DBConnectionService::getConnection();
@@ -34,6 +47,12 @@ class UsergroupDAO {
         return UsergroupDTO::fromDbArray($record_array);
     }
     
+    /**
+     * @param UsergroupDTO $usergroup
+     * @return UsergroupDTO
+     * @throws ValidationException
+     * @throws \Teacher\GivenCode\Exceptions\RuntimeException
+     */
     public function createRecord(UsergroupDTO $usergroup) : UsergroupDTO {
         $usergroup->validateForDbCreation();
         $query =
@@ -52,6 +71,12 @@ class UsergroupDAO {
         return $created_usergroup;
     }
     
+    /**
+     * @param UsergroupDTO $usergroup
+     * @return UsergroupDTO
+     * @throws ValidationException
+     * @throws \Teacher\GivenCode\Exceptions\RuntimeException
+     */
     public function updateRecord(UsergroupDTO $usergroup) : UsergroupDTO {
         $usergroup->validateForDbUpdate();
         $query =
@@ -69,6 +94,11 @@ class UsergroupDAO {
         return $updated_usergroup;
     }
     
+    /**
+     * @param UsergroupDTO $usergroup
+     * @return void
+     * @throws ValidationException
+     */
     public function deleteObject(UsergroupDTO $usergroup) : void {
         if (empty($usergroup->getUsergroupId())) {
             throw new ValidationException("UserGroupDAO is not valid for DB deletion: ID value not set.");
@@ -76,6 +106,11 @@ class UsergroupDAO {
         $this->deleteRecordById($usergroup->getUsergroupId());
     }
     
+    /**
+     * @param int $usergroupid
+     * @return void
+     * @throws \Teacher\GivenCode\Exceptions\RuntimeException
+     */
     public function deleteRecordById(int $usergroupid) : void {
         $query =
             "DELETE FROM `" . UsergroupDTO::TABLE_NAME .

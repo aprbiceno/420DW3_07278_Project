@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace FinalProject\DAOs;
 
@@ -8,9 +9,16 @@ use PDO;
 use RuntimeException;
 use Teacher\GivenCode\Exceptions\ValidationException;
 
+/**
+ *
+ */
 class UserDAO {
     public function __construct() {}
     
+    /**
+     * @return array
+     * @throws \Teacher\GivenCode\Exceptions\RuntimeException
+     */
     public function getAllRecords() : array {
         $query = "SELECT * FROM `" . UserDTO::TABLE_NAME . "`;";
         $connection = DBConnectionService::getConnection();
@@ -24,6 +32,11 @@ class UserDAO {
         return $users;
     }
     
+    /**
+     * @param int $userid
+     * @return UserDTO|null
+     * @throws \Teacher\GivenCode\Exceptions\RuntimeException
+     */
     public function getRecordById(int $userid) : ?UserDTO {
         $query = "SELECT * FROM `" . UserDTO::TABLE_NAME . "` WHERE `userid` = :userid ;";
         $connection = DBConnectionService::getConnection();
@@ -34,6 +47,12 @@ class UserDAO {
         return UserDTO::fromDbArray($record_array);
     }
     
+    /**
+     * @param UserDTO $user
+     * @return UserDTO
+     * @throws ValidationException
+     * @throws \Teacher\GivenCode\Exceptions\RuntimeException
+     */
     public function createRecord(UserDTO $user) : UserDTO {
         $user->validateForDbCreation();
         $query =
@@ -53,6 +72,12 @@ class UserDAO {
         return $created_user;
     }
     
+    /**
+     * @param UserDTO $user
+     * @return UserDTO
+     * @throws ValidationException
+     * @throws \Teacher\GivenCode\Exceptions\RuntimeException
+     */
     public function updateRecord(UserDTO $user) : UserDTO {
         $user->validateForDbUpdate();
         $query =
@@ -71,6 +96,11 @@ class UserDAO {
         return $updated_user;
     }
     
+    /**
+     * @param UserDTO $user
+     * @return void
+     * @throws ValidationException
+     */
     public function deleteObject(UserDTO $user) : void {
         if (empty($user->getUserId())) {
             throw new ValidationException("UserDAO is not valid for DB deletion: ID value not set.");
@@ -78,6 +108,11 @@ class UserDAO {
         $this->deleteRecordById($user->getUserId());
     }
     
+    /**
+     * @param int $userid
+     * @return void
+     * @throws \Teacher\GivenCode\Exceptions\RuntimeException
+     */
     public function deleteRecordById(int $userid) : void {
         $query =
             "DELETE FROM `" . UserDTO::TABLE_NAME .

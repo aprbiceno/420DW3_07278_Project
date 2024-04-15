@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace FinalProject\DAOs;
 
@@ -8,9 +9,17 @@ use PDO;
 use RuntimeException;
 use Teacher\GivenCode\Exceptions\ValidationException;
 
+
+/**
+ *
+ */
 class PermissionDAO {
     public function __construct() {}
     
+    /**
+     * @return array
+     * @throws \Teacher\GivenCode\Exceptions\RuntimeException
+     */
     public function getAllRecords() : array {
         $query = "SELECT * FROM `" . PermissionDTO::TABLE_NAME . "`;";
         $connection = DBConnectionService::getConnection();
@@ -24,6 +33,11 @@ class PermissionDAO {
         return $permissions;
     }
     
+    /**
+     * @param int $permissionid
+     * @return PermissionDTO|null
+     * @throws \Teacher\GivenCode\Exceptions\RuntimeException
+     */
     public function getRecordById(int $permissionid) : ?PermissionDTO {
         $query = "SELECT * FROM `" . PermissionDTO::TABLE_NAME . "` WHERE `permissionid` = :permissionid ;";
         $connection = DBConnectionService::getConnection();
@@ -34,15 +48,22 @@ class PermissionDAO {
         return PermissionDTO::fromDbArray($record_array);
     }
     
+    /**
+     * @param PermissionDTO $permission
+     * @return PermissionDTO
+     * @throws ValidationException
+     * @throws \Teacher\GivenCode\Exceptions\RuntimeException
+     */
     public function createRecord(PermissionDTO $permission) : PermissionDTO {
         $permission->validateForDbCreation();
         $query =
             "INSERT INTO `" . PermissionDTO::TABLE_NAME .
-            "` (`permissionname`, `permissiondescription`) VALUES (:permissionname, :permissiondescription);";
+            "` (`permissionstring`, `permissionname`, `permissiondescription`) VALUES (:permissionstring, :permissionname, :permissiondescription);";
         $connection = DBConnectionService::getConnection();
         $statement = $connection->prepare($query);
-        $statement->bindValue(":permissionname", $permission->getUsergroupName(), PDO::PARAM_STR);
-        $statement->bindValue(":permissiondescription", $permission->getUsergroupDescription(), PDO::PARAM_STR);
+        $statement->bindValue(":permissionstring", $permission->getPermissionString(), PDO::PARAM_STR);
+        $statement->bindValue(":permissionname", $permission->getPermissionName(), PDO::PARAM_STR);
+        $statement->bindValue(":permissiondescription", $permission->getPermissionDescription(), PDO::PARAM_STR);
         $statement->execute();
         $new_id = (int) $connection->lastInsertId();
         $created_permission = $this->getRecordById($new_id);
@@ -52,6 +73,12 @@ class PermissionDAO {
         return $created_permission;
     }
     
+    /**
+     * @param PermissionDTO $permission
+     * @return PermissionDTO
+     * @throws ValidationException
+     * @throws \Teacher\GivenCode\Exceptions\RuntimeException
+     */
     public function updateRecord(PermissionDTO $permission) : PermissionDTO {
         $permission->validateForDbUpdate();
         $query =
@@ -59,23 +86,34 @@ class PermissionDAO {
             "` SET `permissionname` = :permissionname, `permissiondescription` = :permissiondescription  WHERE `permissionid` = :permissionid ;";
         $connection = DBConnectionService::getConnection();
         $statement = $connection->prepare($query);
-        $statement->bindValue(":permissionname", $permission->getUsergroupName(), PDO::PARAM_STR);
-        $statement->bindValue(":permissiondescription", $permission->getUsergroupDescription(), PDO::PARAM_STR);
+        $statement->bindValue(":permissionstring", $permission->getPermissionString(), PDO::PARAM_STR);
+        $statement->bindValue(":permissionname", $permission->getPermissionName(), PDO::PARAM_STR);
+        $statement->bindValue(":permissiondescription", $permission->getPermissionDescription(), PDO::PARAM_STR);
         $statement->execute();
-        $updated_permission = $this->getRecordById($permission->getUsergroupId());
+        $updated_permission = $this->getRecordById($permission->getPermissionId());
         if (($updated_permission === null)) {
             throw new RuntimeException("Error while fetching information of the new permission. User ID: {$permission->getUsergroupId()}");
         }
         return $updated_permission;
     }
     
+    /**
+     * @param PermissionDTO $permission
+     * @return void
+     * @throws ValidationException|\Teacher\GivenCode\Exceptions\RuntimeException
+     */
     public function deleteObject(PermissionDTO $permission) : void {
-        if (empty($permission->getUsergroupId())) {
-            throw new ValidationException("UserGroupDAO is not valid for DB deletion: ID value not set.");
+        if (empty($permission->getPermissionId())) {
+            throw new ValidationException("PermissionDAO is not valid for DB deletion: ID value not set.");
         }
-        $this->deleteRecordById($permission->getUsergroupId());
+        $this->deleteRecordById($permission->getPermissionId());
     }
     
+    /**
+     * @param int $permissionid
+     * @return void
+     * @throws \Teacher\GivenCode\Exceptions\RuntimeException
+     */
     public function deleteRecordById(int $permissionid) : void {
         $query =
             "DELETE FROM `" . PermissionDTO::TABLE_NAME .
