@@ -40,7 +40,7 @@ class UserPermissionsDAO {
      * @return void
      * @throws RuntimeException
      */
-    public function createManyForPermission(int $permissionId, array $userIds) : void {
+    public function createManyUsersForPermission(int $permissionId, array $userIds) : void {
         $connection = DBConnectionService::getConnection();
         $statement = $connection->prepare(self::CREATE_QUERY);
         $statement->bindValue(":permissionid", $permissionId, PDO::PARAM_INT);
@@ -56,7 +56,7 @@ class UserPermissionsDAO {
      * @return void
      * @throws RuntimeException
      */
-    public function createManyForUser(int $userId, array $permissionIds) : void {
+    public function createManyPermissionsForUser(int $userId, array $permissionIds) : void {
         $connection = DBConnectionService::getConnection();
         $statement = $connection->prepare(self::CREATE_QUERY);
         $statement->bindValue(":userid", $userId, PDO::PARAM_INT);
@@ -71,7 +71,7 @@ class UserPermissionsDAO {
      * @return void
      * @throws RuntimeException
      */
-    public function deleteAllByUserId(int $userId) : void {
+    public function deleteAllPermissionsByUserId(int $userId) : void {
         $query = "DELETE FROM " . self::TABLE_NAME . " WHERE `userid` = :userid ;";
         $connection = DBConnectionService::getConnection();
         $statement = $connection->prepare($query);
@@ -84,7 +84,7 @@ class UserPermissionsDAO {
      * @return void
      * @throws RuntimeException
      */
-    public function deleteAllByPermissionId(int $permissionId) : void {
+    public function deleteAllUsersByPermissionId(int $permissionId) : void {
         $query = "DELETE FROM " . self::TABLE_NAME . " WHERE `permissionid` = :permissionid ;";
         $connection = DBConnectionService::getConnection();
         $statement = $connection->prepare($query);

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace FinalProject\DAOs;
 
+use FinalProject\DTOs\PermissionDTO;
 use FinalProject\DTOs\UserDTO;
 use FinalProject\Services\DBConnectionService;
 use PDO;
@@ -19,7 +20,7 @@ class UserDAO {
      * @return array
      * @throws \Teacher\GivenCode\Exceptions\RuntimeException
      */
-    public function getAllRecords() : array {
+    public function getAllUsersRecords() : array {
         $query = "SELECT * FROM `" . UserDTO::TABLE_NAME . "`;";
         $connection = DBConnectionService::getConnection();
         $statement = $connection->prepare($query);
@@ -37,7 +38,7 @@ class UserDAO {
      * @return UserDTO|null
      * @throws \Teacher\GivenCode\Exceptions\RuntimeException
      */
-    public function getRecordById(int $userid) : ?UserDTO {
+    public function getUserRecordById(int $userid) : ?UserDTO {
         $query = "SELECT * FROM `" . UserDTO::TABLE_NAME . "` WHERE `userid` = :userid ;";
         $connection = DBConnectionService::getConnection();
         $statement = $connection->prepare($query);
@@ -53,7 +54,7 @@ class UserDAO {
      * @throws ValidationException
      * @throws \Teacher\GivenCode\Exceptions\RuntimeException
      */
-    public function createRecord(UserDTO $user) : UserDTO {
+    public function createUserRecord(UserDTO $user) : UserDTO {
         $user->validateForDbCreation();
         $query =
             "INSERT INTO `" . UserDTO::TABLE_NAME .
@@ -65,9 +66,9 @@ class UserDAO {
         $statement->bindValue(":email", $user->getEmail(), PDO::PARAM_STR);
         $statement->execute();
         $new_id = (int) $connection->lastInsertId();
-        $created_user = $this->getRecordById($new_id);
+        $created_user = $this->getUserRecordById($new_id);
         if (($created_user === null)) {
-            throw new RuntimeException("Error while fetching information of the new user. User ID: {$new_id}");
+            throw new RuntimeException("Error while fetching information of the new user. User ID: $new_id");
         }
         return $created_user;
     }
@@ -78,7 +79,7 @@ class UserDAO {
      * @throws ValidationException
      * @throws \Teacher\GivenCode\Exceptions\RuntimeException
      */
-    public function updateRecord(UserDTO $user) : UserDTO {
+    public function updateUserRecord(UserDTO $user) : UserDTO {
         $user->validateForDbUpdate();
         $query =
             "UPDATE `" . UserDTO::TABLE_NAME .
@@ -89,7 +90,7 @@ class UserDAO {
         $statement->bindValue(":password", $user->getPassword(), PDO::PARAM_STR);
         $statement->bindValue(":email", $user->getEmail(), PDO::PARAM_STR);
         $statement->execute();
-        $updated_user = $this->getRecordById($user->getUserId());
+        $updated_user = $this->getUserRecordById($user->getUserId());
         if (($updated_user === null)) {
             throw new RuntimeException("Error while fetching information of the new user. User ID: {$user->getUserId()}");
         }
@@ -100,12 +101,13 @@ class UserDAO {
      * @param UserDTO $user
      * @return void
      * @throws ValidationException
+     * @throws \Teacher\GivenCode\Exceptions\RuntimeException
      */
-    public function deleteObject(UserDTO $user) : void {
+    public function deleteObjectUser(UserDTO $user) : void {
         if (empty($user->getUserId())) {
             throw new ValidationException("UserDAO is not valid for DB deletion: ID value not set.");
         }
-        $this->deleteRecordById($user->getUserId());
+        $this->deleteUserRecordById($user->getUserId());
     }
     
     /**
@@ -113,7 +115,7 @@ class UserDAO {
      * @return void
      * @throws \Teacher\GivenCode\Exceptions\RuntimeException
      */
-    public function deleteRecordById(int $userid) : void {
+    public function deleteUserRecordById(int $userid) : void {
         $query =
             "DELETE FROM `" . UserDTO::TABLE_NAME .
             "` WHERE `userid` = :userid ;";
@@ -121,6 +123,30 @@ class UserDAO {
         $statement = $connection->prepare($query);
         $statement->bindValue(":userid", $userid, PDO::PARAM_INT);
         $statement->execute();
+    }
+    
+    /**
+     * @param int $userid
+     * @return array
+     * @throws ValidationException
+     * @throws \Teacher\GivenCode\Exceptions\RuntimeException
+     */
+    public function getPermissionsByUserId(int $userid) : array {
+        $query = "SELECT p.* FROM " . UserDTO::TABLE_NAME . " u JOIN user_permissions" .
+            " up ON u.userid = up.userid JOIN " . PermissionDTO::TABLE_NAME .
+            " p ON up.permissionid = p.permissionid WHERE u.userid = :userid ;";
+        $connection = DBConnectionService::getConnection();
+        $statement = $connection->prepare($query);
+        $statement->bindValue(":userid", $userid, PDO::PARAM_INT);
+        $statement->execute();
+        
+        $result_set = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $permissions_array = [];
+        foreach ($result_set as $permission_record_array) {
+            $permissions_array[] = PermissionDTO::fromDbArray($permission_record_array);
+        }
+        return $permissions_array;
+        
     }
     
 }

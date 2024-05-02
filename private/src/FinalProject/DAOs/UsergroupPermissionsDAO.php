@@ -38,7 +38,7 @@ class UsergroupPermissionsDAO {
      * @return void
      * @throws RuntimeException
      */
-    public function createManyForPermission(int $permissionId, array $usergroupIds) : void {
+    public function createManyUGsForPermission(int $permissionId, array $usergroupIds) : void {
         $connection = DBConnectionService::getConnection();
         $statement = $connection->prepare(self::CREATE_QUERY);
         $statement->bindValue(":permissionid", $permissionId, PDO::PARAM_INT);
@@ -54,7 +54,7 @@ class UsergroupPermissionsDAO {
      * @return void
      * @throws RuntimeException
      */
-    public function createManyForUsergroup(int $usergroupId, array $permissionIds) : void {
+    public function createManyPermissionsForUsergroup(int $usergroupId, array $permissionIds) : void {
         $connection = DBConnectionService::getConnection();
         $statement = $connection->prepare(self::CREATE_QUERY);
         $statement->bindValue(":usergroupid", $usergroupId, PDO::PARAM_INT);
@@ -96,7 +96,7 @@ class UsergroupPermissionsDAO {
      * @return void
      * @throws RuntimeException
      */
-    public function deletePermissionFromUsergroup(int $permissionId, int $usergroupId) : void {
+    public function deletePermissionUsergroup(int $permissionId, int $usergroupId) : void {
         $connection = DBConnectionService::getConnection();
         $query =
             "DELETE FROM " . self::TABLE_NAME . " WHERE permissionid = :permissionid AND usergroupid = :usergroupid";

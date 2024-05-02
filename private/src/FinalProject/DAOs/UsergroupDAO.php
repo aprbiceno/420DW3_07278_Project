@@ -19,7 +19,7 @@ class UsergroupDAO {
      * @return array
      * @throws \Teacher\GivenCode\Exceptions\RuntimeException
      */
-    public function getAllRecords() : array {
+    public function getAllUsergroupRecords() : array {
         $query = "SELECT * FROM `" . UsergroupDTO::TABLE_NAME . "`;";
         $connection = DBConnectionService::getConnection();
         $statement = $connection->prepare($query);
@@ -37,7 +37,7 @@ class UsergroupDAO {
      * @return UsergroupDTO|null
      * @throws \Teacher\GivenCode\Exceptions\RuntimeException
      */
-    public function getRecordById(int $usergroupid) : ?UsergroupDTO {
+    public function getUsergroupRecordById(int $usergroupid) : ?UsergroupDTO {
         $query = "SELECT * FROM `" . UsergroupDTO::TABLE_NAME . "` WHERE `usergroupid` = :usergroupid ;";
         $connection = DBConnectionService::getConnection();
         $statement = $connection->prepare($query);
@@ -53,7 +53,7 @@ class UsergroupDAO {
      * @throws ValidationException
      * @throws \Teacher\GivenCode\Exceptions\RuntimeException
      */
-    public function createRecord(UsergroupDTO $usergroup) : UsergroupDTO {
+    public function createUsergroupRecord(UsergroupDTO $usergroup) : UsergroupDTO {
         $usergroup->validateForDbCreation();
         $query =
             "INSERT INTO `" . UsergroupDTO::TABLE_NAME .
@@ -64,7 +64,7 @@ class UsergroupDAO {
         $statement->bindValue(":usergroupdescription", $usergroup->getUsergroupDescription(), PDO::PARAM_STR);
         $statement->execute();
         $new_id = (int) $connection->lastInsertId();
-        $created_usergroup = $this->getRecordById($new_id);
+        $created_usergroup = $this->getUsergroupRecordById($new_id);
         if (($created_usergroup === null)) {
             throw new RuntimeException("Error while fetching information of the new usergroup. User ID: {$new_id}");
         }
@@ -77,7 +77,7 @@ class UsergroupDAO {
      * @throws ValidationException
      * @throws \Teacher\GivenCode\Exceptions\RuntimeException
      */
-    public function updateRecord(UsergroupDTO $usergroup) : UsergroupDTO {
+    public function updateUsergroupRecord(UsergroupDTO $usergroup) : UsergroupDTO {
         $usergroup->validateForDbUpdate();
         $query =
             "UPDATE `" . UsergroupDTO::TABLE_NAME .
@@ -87,7 +87,7 @@ class UsergroupDAO {
         $statement->bindValue(":usergroupname", $usergroup->getUsergroupName(), PDO::PARAM_STR);
         $statement->bindValue(":usergroupdescription", $usergroup->getUsergroupDescription(), PDO::PARAM_STR);
         $statement->execute();
-        $updated_usergroup = $this->getRecordById($usergroup->getUsergroupId());
+        $updated_usergroup = $this->getUsergroupRecordById($usergroup->getUsergroupId());
         if (($updated_usergroup === null)) {
             throw new RuntimeException("Error while fetching information of the new usergroup. User ID: {$usergroup->getUsergroupId()}");
         }
@@ -97,13 +97,13 @@ class UsergroupDAO {
     /**
      * @param UsergroupDTO $usergroup
      * @return void
-     * @throws ValidationException
+     * @throws ValidationException|\Teacher\GivenCode\Exceptions\RuntimeException
      */
-    public function deleteObject(UsergroupDTO $usergroup) : void {
+    public function deleteObjectUsergroup(UsergroupDTO $usergroup) : void {
         if (empty($usergroup->getUsergroupId())) {
             throw new ValidationException("UserGroupDAO is not valid for DB deletion: ID value not set.");
         }
-        $this->deleteRecordById($usergroup->getUsergroupId());
+        $this->deleteUsergroupRecordById($usergroup->getUsergroupId());
     }
     
     /**
@@ -111,7 +111,7 @@ class UsergroupDAO {
      * @return void
      * @throws \Teacher\GivenCode\Exceptions\RuntimeException
      */
-    public function deleteRecordById(int $usergroupid) : void {
+    public function deleteUsergroupRecordById(int $usergroupid) : void {
         $query =
             "DELETE FROM `" . UsergroupDTO::TABLE_NAME .
             "` WHERE `usergroupid` = :usergroupid ;";

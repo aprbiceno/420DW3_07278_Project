@@ -1,15 +1,29 @@
 <?php
+declare(strict_types=1);
 
 namespace FinalProject\DTOs;
 
 use DateTime;
 use Teacher\GivenCode\Abstracts\AbstractDTO;
 use Teacher\GivenCode\Exceptions\ValidationException;
-class UsergroupDTO extends AbstractDTO{
+
+/**
+ *
+ */
+class UsergroupDTO extends AbstractDTO {
     
+    /**
+     * name of the table
+     */
     public const TABLE_NAME = "usergroups";
     
+    /**
+     * usergroup name max lenght
+     */
     public const USERGROUP_NAME_MAX_LENGHT = 50;
+    /**
+     * usergroup description max lenght
+     */
     public const USERGROUP_DESCRIPTION_LENGHT = 100;
     
     private int $usergroupid;
@@ -23,13 +37,24 @@ class UsergroupDTO extends AbstractDTO{
         parent::__construct();
     }
     
+    /**
+     * @param string $usergroupname
+     * @param string $usergroupdescription
+     * @return UsergroupDTO
+     * @throws ValidationException
+     */
     public static function fromValues(string $usergroupname, string $usergroupdescription) : UsergroupDTO{
         $instance = new UsergroupDTO();
-        $instance -> setPUsergroupName($usergroupname);
-        $instance -> setPUsergroupDescription($usergroupdescription);
+        $instance->setUsergroupName($usergroupname);
+        $instance->setUsergroupDescription($usergroupdescription);
         return $instance;
     }
     
+    /**
+     * @param array $dbAssocArray
+     * @return UsergroupDTO
+     * @throws ValidationException
+     */
     public static function fromDbArray(array $dbAssocArray) : UsergroupDTO {
         $object = new UsergroupDTO();
         $object->setUsergroupId((int) $dbAssocArray["usergroupid"]);
@@ -38,21 +63,32 @@ class UsergroupDTO extends AbstractDTO{
         $object->setCreationDate(
             DateTime::createFromFormat(DB_DATETIME_FORMAT, $dbAssocArray["creationdate"])
         );
-        $object->setLastModificationDate(
+        $object->setModifyDate(
             (empty($dbAssocArray["modifydate"])) ? null
                 : DateTime::createFromFormat(DB_DATETIME_FORMAT, $dbAssocArray["modifydate"])
         );
         return $object;
     }
     
+    /**
+     * @inheritDoc
+     */
     public function getDatabaseTableName() : string {
         return self::TABLE_NAME;
     }
     
+    /**
+     * @return int
+     */
     public function getUsergroupId() : int {
         return $this->usergroupid;
     }
     
+    /**
+     * @param int $usergroupId
+     * @return void
+     * @throws ValidationException
+     */
     public function setUsergroupId(int $usergroupId) : void {
         if ($usergroupId < 1) {
             throw new ValidationException("[permissionid] value must be a positive integer greater than 0.");
@@ -60,10 +96,18 @@ class UsergroupDTO extends AbstractDTO{
         $this->usergroupid = $usergroupId;
     }
     
+    /**
+     * @return string
+     */
     public function getUsergroupName() : string {
         return $this->usergroupname;
     }
     
+    /**
+     * @param string $usergroupname
+     * @return void
+     * @throws ValidationException
+     */
     public function setUsergroupName(string $usergroupname) : void {
         if (mb_strlen($usergroupname) > self::USERGROUP_NAME_MAX_LENGHT) {
             throw new ValidationException("[username] value must be a string no longer than " . self::USERGROUP_NAME_MAX_LENGHT .
@@ -72,10 +116,18 @@ class UsergroupDTO extends AbstractDTO{
         $this->usergroupname = $usergroupname;
     }
     
+    /**
+     * @return string
+     */
     public function getUsergroupDescription() : string {
         return $this->usergroupdescription;
     }
     
+    /**
+     * @param string $usergroupDescription
+     * @return void
+     * @throws ValidationException
+     */
     public function setUsergroupDescription(string $usergroupDescription) : void {
         if (mb_strlen($usergroupDescription) > self::USERGROUP_DESCRIPTION_LENGHT) {
             throw new ValidationException("[email] value must be a string no longer than " . self::USERGROUP_DESCRIPTION_LENGHT .
@@ -84,22 +136,41 @@ class UsergroupDTO extends AbstractDTO{
         $this->usergroupdescription = $usergroupDescription;
     }
     
+    /**
+     * @return DateTime
+     */
     public function getCreationDate() : DateTime {
         return $this->creationDate;
     }
     
+    /**
+     * @param DateTime $creationDate
+     * @return void
+     */
     public function setCreationDate(DateTime $creationDate) : void {
         $this->creationDate = $creationDate;
     }
     
+    /**
+     * @return DateTime
+     */
     public function getModifyDate() : DateTime {
         return $this->modifyDate;
     }
     
+    /**
+     * @param DateTime $modifyDate
+     * @return void
+     */
     public function setModifyDate(DateTime $modifyDate) : void {
         $this->modifyDate = $modifyDate;
     }
     
+    /**
+     * @param bool $optThrowExceptions
+     * @return bool
+     * @throws ValidationException
+     */
     public function validateForDbCreation(bool $optThrowExceptions = true) : bool {
         if (empty($this->usergroupname)) {
             if ($optThrowExceptions) {
@@ -116,6 +187,11 @@ class UsergroupDTO extends AbstractDTO{
         return true;
     }
     
+    /**
+     * @param bool $optThrowExceptions
+     * @return bool
+     * @throws ValidationException
+     */
     public function validateForDbUpdate(bool $optThrowExceptions = true) : bool {
         if (empty($this->usergroupname)) {
             if ($optThrowExceptions) {
