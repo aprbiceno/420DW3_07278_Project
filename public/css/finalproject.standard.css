@@ -1,0 +1,120 @@
+html, body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    font-family: Arial, sans-serif; /* Cambiar el tipo de fuente */
+}
+
+header {
+    background-color: #3498db; /* Cambiar el color de fondo del encabezado */
+    color: white;
+}
+
+.sticky {
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+.header-container {
+    padding-bottom: 5px;
+}
+
+.nav-bar-entry {
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.nav-bar-entry:hover {
+    background-color: #2c3e50; /* Cambiar el color de fondo al pasar el cursor */
+    cursor: pointer;
+}
+
+main {
+    flex: 1 0 auto;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+footer {
+    background-color: #3498db; /* Cambiar el color de fondo del pie de página */
+    color: white;
+    flex-shrink: 0;
+    padding-bottom: 20px;
+    padding-top: 20px;
+}
+
+.fullwidth {
+    width: 100%;
+}
+
+.hidden {
+    display: none;
+}
+
+.error-display {
+    background-color: #e74c3c; /* Cambiar el color de fondo del mensaje de error */
+    border: 1px solid #c0392b; /* Cambiar el color del borde del mensaje de error */
+    border-radius: 5px;
+}
+
+.error-text {
+    color: #c0392b; /* Cambiar el color del texto del mensaje de error */
+}
+
+*:disabled {
+    cursor: not-allowed;
+}
+
+.button-row {
+    padding-top: 10px;
+}
+
+.links-block > a {
+    color: white;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.copyright-container {
+    padding-top: 10px;
+}
+
+.copyright-notice {
+    font-size: smaller;
+    font-style: italic;
+    margin-top: 10px;
+}
+
+.text-red {
+    color: red;
+}
+
+@media (max-width: 575px) {
+    /* very small screens (bootstrap xs)*/
+
+}
+@media (min-width: 576px) {
+    /* small screens (bootstrap sm)*/
+    label {
+        text-align: end;
+    }
+}
+@media (min-width: 768px) {
+    /* medium screens (bootstrap md)*/
+}
+@media (min-width: 992px) {
+    /* large screens (bootstrap lg)*/
+
+}
+@media (min-width: 1200px) {
+    /* very large screens (bootstrap xl)*/
+
+}
+@media (min-width: 1400px) {
+    /* very very large screens (bootstrap xxl)*/
+
+}
