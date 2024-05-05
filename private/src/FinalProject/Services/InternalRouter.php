@@ -6,6 +6,7 @@ use FinalProject\Controllers\LoginController;
 use FinalProject\Controllers\PermissionController;
 use FinalProject\Controllers\UserController;
 use FinalProject\Controllers\UsergroupController;
+use FinalProject\Controllers\PageNavigator;
 use Teacher\GivenCode\Abstracts\IService;
 use Teacher\GivenCode\Domain\AbstractRoute;
 use Teacher\GivenCode\Domain\APIRoute;
@@ -39,8 +40,10 @@ class InternalRouter implements IService {
         $this->routes->addRoute(new WebpageRoute("/", "FinalProject/Home_page.php"));
         $this->routes->addRoute(new CallableRoute("/pages/login", [PageNavigator::class, "loginPage"]));
         $this->routes->addRoute(new CallableRoute("/pages/users", [PageNavigator::class, "usersManagementPage"]));
-        $this->routes->addRoute(new CallableRoute("/pages/usergroups", [PageNavigator::class, "usergroupsManagementPage"]));
-        $this->routes->addRoute(new CallableRoute("/pages/permissions", [PageNavigator::class, "permissionsManagementPage"]));
+        $this->routes->addRoute(new CallableRoute("/pages/usergroups",
+                                                  [PageNavigator::class, "usergroupsManagementPage"]));
+        $this->routes->addRoute(new CallableRoute("/pages/permissions",
+                                                  [PageNavigator::class, "permissionsManagementPage"]));
     }
     
     /**
